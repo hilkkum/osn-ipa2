@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OSN IPA - SDN 002 Sangatta Utara</title>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        body { background-color: #2D9596; font-family: 'Quicksand', sans-serif; color: #2D3748; margin: 0; }
+        .kid-card { background: #ffffff; border-bottom: 6px solid #e2e8f0; border-radius: 2rem; }
+        .option-active { background-color: #FFD93D !important; border-color: #F4B400 !important; color: #856404 !important; }
+        .bool-active { background-color: #6BCB77 !important; color: white !important; border-color: #4CAF50 !important; }
+        .ragu-active { background-color: #FFB84C !important; color: white !important; border-color: #E69500 !important; }
+        .footer-combined { display: flex; align-items: center; justify-content: center; gap: 15px; margin-top: 20px; width: 100%; }
+        .dev-text { opacity: 0.8; font-size: 0.75rem; color: white; font-weight: bold; }
+        .admin-link { background: rgba(0,0,0,0.2); color: white; padding: 5px 15px; border-radius: 20px; font-size: 0.75rem; font-weight: bold; cursor: pointer; border: 1px solid rgba(255,255,255,0.2); }
+        .grid-nav { display: grid; grid-template-cols: repeat(5, 1fr); gap: 8px; }
+        .nav-btn { height: 40px; border-radius: 10px; font-weight: 800; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        const questionBank = [
+            { id: 1, type: "pg", text: "Jika populasi katak di sebuah sawah menurun drastis akibat perburuan manusia, dampak jangka panjang yang paling mungkin terjadi pada ekosistem tersebut adalah...", options: ["Populasi belalang menurun karena jumlah ular meningkat", "Populasi rumput meningkat karena jumlah belalang berkurang", "Populasi ular menurun drastis sehingga populasi elang terancam", "Populasi belalang meningkat drastis sehingga merusak tanaman padi"], answer: 3 },
+            { id: 2, type: "pg", text: "Penyu laut merupakan hewan yang siklus hidupnya dimulai dari telur di pantai hingga dewasa di samudera. Mengingat banyaknya predator di pantai, upaya pelestarian yang paling tepat untuk mengaitkan siklus hidup penyu dengan keberhasilannya mencapai usia dewasa adalah...", options: ["Melarang nelayan menangkap ikan di seluruh area laut", "Memindahkan telur ke tempat penetasan semi-alami (penangkaran) lalu melepas tukik secara bersamaan", "Memberi makan tukik (anak penyu) di laut lepas agar cepat besar", "Memagari seluruh pantai agar tidak ada hewan lain yang masuk"], answer: 1 },
+            { id: 3, type: "pg", text: "Hubungan antara bentuk tubuh dan fungsi adaptasi yang benar adalah...", options: ["Kaktus berdaun duri untuk mempercepat penguapan", "Teratai berdaun lebar untuk menyerap oksigen lebih banyak dari air", "Kantong semar menghasilkan nektar untuk memerangkap serangga sebagai sumber nitrogen", "Kaktus berdaun duri untuk menyimpan cadangan makanan"], answer: 2 },
+            { id: 4, type: "pg", text: "Jika seseorang sering terpapar polusi asap rokok yang merusak elastisitas alveolus, maka gangguan yang terjadi adalah...", options: ["Udara tidak bisa masuk melalui hidung", "Proses penyaringan kuman di tenggorokan terhenti", "Penyerapan oksigen ke dalam darah menjadi tidak maksimal", "Frekuensi bernapas menjadi lebih lambat dari biasanya"], answer: 2 },
+            { id: 5, type: "pg", text: "Seorang remaja laki-laki mulai mengalami perubahan suara menjadi lebih berat dan mengalami mimpi basah. Tindakan yang paling tepat terkait kesehatan reproduksi pada fase ini adalah...", options: ["Mengurangi aktivitas fisik agar tidak cepat lelah", "Menjaga kebersihan organ reproduksi dan memahami bahwa itu adalah proses alami", "Mengonsumsi obat hormonal agar pertumbuhan lebih cepat", "Menghindari bersosialisasi dengan teman lawan jenis"], answer: 1 },
+            { id: 6, type: "pg", text: "Andi berteriak di depan sebuah gua dan mendengar suaranya kembali dengan jelas setelah beberapa saat. Namun, saat Andi berteriak di dalam gedung bioskop yang tidak dipasangi peredam, suaranya terdengar tidak jelas dan tumpang tindih. Perbedaan ini terjadi karena...", options: ["Bunyi di dalam gedung bioskop merambat lebih lambat", "Di dalam gedung terjadi gaung karena jarak dinding pemantul sangat dekat", "Gua memiliki dinding yang menyerap bunyi", "Bunyi di gua tidak mengalami pemantulan"], answer: 1 },
+            { id: 7, type: "pg", text: "Sebuah benda diletakkan di depan lampu senter. Ketika benda digeser mendekati lampu senter, maka ukuran bayangan benda pada layar di belakangnya akan...", options: ["Menjadi lebih kecil dan lebih tajam", "Menjadi lebih besar dan lebih kabur", "Tetap sama karena ukuran benda tidak berubah", "Hilang karena tertutup oleh cahaya senter"], answer: 1 },
+            { id: 8, type: "pg", text: "Keunggulan dari sendi yang menghubungkan tulang lengan atas dengan tulang belikat dalam menunjang kegiatan manusia sehari-hari adalah...", options: ["Memungkinkan gerakan ke satu arah saja agar stabil", "Memungkinkan gerakan memutar sehingga tangan sangat fleksibel", "Menghindari gesekan antar tulang agar tidak nyeri", "Membatasi gerakan agar tulang tidak mudah patah"], answer: 1 },
+            { id: 9, type: "pg", text: "Penebangan hutan secara liar menyebabkan daerah resapan air berkurang. Tahapan siklus air yang paling terganggu secara langsung akibat hilangnya vegetasi hutan adalah...", options: ["Evaporasi (Penguapan air laut)", "Kondensasi (Pembentukan awan)", "Infiltrasi (Penyerapan air ke dalam tanah)", "Presipitasi (Terjadinya hujan)"], answer: 2 },
+            { id: 10, type: "pg", text: "Sebuah paku dililiti kawat berarus listrik (baterai). Paku tersebut kemudian dapat menarik klip kertas. Cara pembuatan magnet ini disebut elektromagnet. Jika jumlah baterai ditambah, maka...", options: ["Paku akan menjadi panas dan kehilangan sifat magnetnya", "Daya tarik magnet pada paku akan semakin kuat", "Kutub magnet pada paku akan bertukar posisi", "Paku akan menolak semua benda logam"], answer: 1 },
+            { id: 11, type: "pg", text: "Ibu memasak air menggunakan panci aluminium. Gagang panci tersebut dilapisi oleh plastik. Penggunaan plastik pada gagang panci didasarkan pada sifat...", options: ["Plastik adalah konduktor panas yang baik", "Plastik adalah isolator panas agar tangan tidak melepuh", "Plastik dapat mempercepat air mendidih", "Plastik mengubah panas menjadi energi gerak"], answer: 1 },
+            { id: 12, type: "pg", text: "Air laut terdiri dari air, garam, dan berbagai mineral lainnya. Berdasarkan komponen penyusunnya, air laut dikelompokkan ke dalam...", options: ["Zat Tunggal karena tampak bening", "Unsur karena terdiri dari atom-atom", "Campuran Homogen karena zat penyusunnya tercampur rata", "Campuran Heterogen karena garam bisa mengendap"], answer: 2 },
+            { id: 13, type: "pg", text: "Di daerah pegunungan yang memiliki aliran sungai deras, penduduk membangun kincir air untuk menghasilkan listrik. Perubahan energi yang terjadi adalah...", options: ["Energi potensial -> energi panas -> energi listrik", "Energi kinetik -> energi gerak kincir -> energi listrik (melalui generator)", "Energi kimia -> energi listrik", "Energi listrik -> energi gerak"], answer: 1 },
+            { id: 14, type: "pg", text: "Pada posisi Bumi berada di antara Matahari dan Bulan dalam satu garis lurus, maka penduduk bumi yang berada di sisi gelap akan melihat fenomena...", options: ["Gerhana Matahari Total", "Gerhana Bulan Total", "Bulan Sabit", "Gerhana Matahari Cincin"], answer: 1 },
+            { id: 15, type: "pg", text: "Penggunaan pestisida kimia secara berlebihan oleh petani dapat membunuh hama, namun juga merusak tanah. Alternatif yang paling bijaksana untuk menjaga keseimbangan lingkungan adalah...", options: ["Berhenti bertani agar tanah pulih kembali", "Menggunakan predator alami (biopestisida) untuk mengendalikan hama", "Membakar lahan setelah panen untuk mematikan sisa hama", "Mengganti semua tanaman dengan tanaman plastik"], answer: 1 },
+            { id: 16, type: "pg", text: "Ketika sebuah bus yang sedang melaju kencang tiba-tiba direm mendadak oleh sopir, para penumpang akan terdorong ke depan. Hal ini membuktikan bahwa gaya dapat...", options: ["Mengubah bentuk benda", "Mengubah arah gerak benda", "Menghentikan gerak benda yang sedang bergerak", "Membuat benda diam menjadi bergerak"], answer: 2 },
+            { id: 17, type: "pg", text: "Darah yang banyak mengandung oksigen mengalir dari paru-paru kembali ke jantung melalui vena pulmonalis. Jika bagian jantung sebelah kiri mengalami gangguan otot (lemah), maka dampak bagi tubuh adalah...", options: ["Seluruh tubuh akan kekurangan suplai oksigen dan mudah lelah", "Darah tidak bisa masuk ke paru-paru", "Tekanan darah di seluruh tubuh akan meningkat drastis", "Produksi sel darah merah akan berhenti"], answer: 0 },
+            { id: 18, type: "pg", text: "Planet ini memiliki julukan 'Planet Merah', atmosfernya tipis, dan memiliki gunung tertinggi di tata surya (Olympus Mons). Planet yang dimaksud adalah...", options: ["Venus", "Mars", "Yupiter", "Saturnus"], answer: 1 },
+            { id: 19, type: "pgk", text: "Manakah dari pernyataan berikut yang merupakan ciri-ciri pubertas pada perempuan?", options: ["Tumbuhnya jakun di leher", "Mengalami menstruasi pertama (Menarche)", "Pinggul mulai melebar dan membesar", "Dada menjadi lebih bidang"], answer: [1, 2] },
+            { id: 20, type: "pgk", text: "Pilihlah pasangan sendi dan fungsinya yang tepat:", options: ["Sendi Engsel: Memungkinkan gerak satu arah (seperti pintu)", "Sendi Pelana: Memungkinkan gerak dua arah (pada pangkal ibu jari)", "Sendi Geser: Memungkinkan gerak memutar 360 derajat", "Sendi Putar: Terdapat pada hubungan tulang atlas dan leher"], answer: [0, 1, 3] },
+            { id: 21, type: "pgk", text: "Cahaya memiliki beberapa sifat unik. Manakah peristiwa yang menunjukkan cahaya dapat dibiaskan?", options: ["Pensil terlihat patah saat dimasukkan ke dalam gelas berisi air", "Terbentuknya bayangan di belakang tubuh kita", "Dasar kolam yang jernih terlihat lebih dangkal dari aslinya", "Cahaya senter menembus kaca jendela"], answer: [0, 2] },
+            { id: 22, type: "pgk", text: "Manakah tumbuhan berikut yang berkembang biak secara vegetatif alami menggunakan umbi lapis?", options: ["Bawang Merah", "Kentang", "Bunga Bakung", "Jahe"], answer: [0, 2] },
+            { id: 23, type: "pgk", text: "Tindakan manusia yang dapat mengganggu keseimbangan ekosistem hutan adalah...", options: ["Melakukan sistem tebang pilih", "Mengalihkan fungsi hutan menjadi perkebunan kelapa sawit secara masif", "Melakukan reboisasi pada lahan gundul", "Perburuan liar hewan-hewan predator"], answer: [1, 3] },
+            { id: 24, type: "pgk", text: "Pilihlah komponen listrik beserta fungsinya yang benar dalam sebuah rangkaian sederhana:", options: ["Baterai: Sebagai sumber energi listrik", "Saklar: Sebagai alat untuk memutus dan menyambung arus", "Kabel: Sebagai tempat penampungan daya listrik", "Lampu: Sebagai alat yang mengubah energi listrik menjadi cahaya"], answer: [0, 1, 3] },
+            { id: 25, type: "pgk", text: "Apa saja sifat-sifat yang dimiliki oleh sebuah magnet permanen?", options: ["Memiliki dua kutub (Utara dan Selatan)", "Kutub yang senama akan tarik-menarik", "Dapat menarik benda-benda yang terbuat dari emas dan plastik", "Kekuatan tarik terbesar berada di bagian kutub-kutubnya"], answer: [0, 3] },
+            { id: 26, type: "pgk", text: "Manakah dari peristiwa berikut yang memerlukan kalor (menyerap panas)?", options: ["Es batu yang diletakkan di suhu ruang hingga menjadi air", "Uap air yang menempel di tutup panci menjadi titik-titik air", "Air di dalam wadah yang mendidih setelah dipanaskan", "Pembuatan agar-agar dari cair menjadi padat"], answer: [0, 2] },
+            { id: 27, type: "pgk", text: "Manakah yang termasuk sumber energi alternatif yang tidak akan habis (terbarukan)?", options: ["Sinar Matahari", "Batubara", "Angin", "Gas Alam"], answer: [0, 2] },
+            { id: 28, type: "pgk", text: "Akibat dari peristiwa revolusi Bumi (Bumi mengelilingi Matahari) adalah...", options: ["Terjadinya siang dan malam", "Perubahan musim di belahan bumi utara dan selatan", "Perbedaan lamanya waktu siang dan malam", "Gerak semu harian matahari dari timur ke barat"], answer: [1, 2] },
+            { id: 29, type: "pgk", text: "Pasangkan hewan dan alat geraknya yang sesuai:", options: ["Ikan menggunakan sirip untuk berenang", "Burung menggunakan sayap untuk terbang", "Ular menggunakan otot perut untuk merayap", "Katak menggunakan ekor untuk melompat di darat"], answer: [0, 1, 2] },
+            { id: 30, type: "pgk", text: "Manakah pernyataan yang benar mengenai fungsi bagian darah?", options: ["Sel darah merah berfungsi mengangkut oksigen", "Sel darah putih berfungsi membunuh kuman penyakit", "Keping darah berfungsi membantu pembekuan darah saat luka", "Plasma darah berfungsi memompa darah ke seluruh tubuh"], answer: [0, 1, 2] },
+            { id: 31, type: "pgk", text: "Manakah contoh campuran heterogen yang komponennya masih bisa dibedakan secara kasat mata?", options: ["Larutan gula (Air + Gula)", "Kopi tubruk (Air + Serbuk kopi)", "Es sirup yang diaduk rata", "Campuran air dengan pasir"], answer: [1, 3] },
+            { id: 32, type: "pgk", text: "Tindakan yang menunjukkan upaya penghematan energi listrik di rumah adalah...", options: ["Mematikan lampu saat ruangan tidak digunakan", "Menggunakan mesin cuci setiap ada satu helai baju kotor", "Mencabut kabel peralatan elektronik dari stop kontak jika tidak dipakai", "Menyalakan televisi sebagai teman tidur sepanjang malam"], answer: [0, 2] },
+            { id: 33, type: "pgk", text: "Manakah pasangan hewan dan alat pernapasan yang benar?", options: ["Belalang bernapas dengan trakea", "Cacing tanah bernapas dengan kulit yang basah", "Paus bernapas dengan insang karena hidup di air", "Berudu (anak katak) bernapas dengan insang"], answer: [0, 1, 3] },
+            { id: 34, type: "bool", text: "Kupu-kupu mengalami tahapan ulat dan kepompong sebelum menjadi dewasa, sehingga disebut mengalami metamorfosis sempurna.", options: ["Sesuai", "Tidak Sesuai"], answer: 0 },
+            { id: 35, type: "bool", text: "Jika sebuah magnet batang dipotong menjadi dua bagian, maka masing-masing potongan hanya akan memiliki satu kutub saja.", options: ["Sesuai", "Tidak Sesuai"], answer: 1 },
+            { id: 36, type: "bool", text: "Matahari adalah pusat tata surya karena semua planet dan benda langit lainnya berputar mengelilinginya akibat gaya gravitasi Matahari.", options: ["Sesuai", "Tidak Sesuai"], answer: 0 },
+            { id: 37, type: "bool", text: "Sendok logam yang terasa panas saat dimasukkan ke dalam kopi panas adalah contoh perpindahan panas secara konveksi.", options: ["Sesuai", "Tidak Sesuai"], answer: 1 },
+            { id: 38, type: "bool", text: "Emas murni dan garam dapur merupakan contoh zat tunggal karena terdiri dari materi yang sejenis.", options: ["Sesuai", "Tidak Sesuai"], answer: 0 },
+            { id: 39, type: "bool", text: "Buah apel yang jatuh dari pohon ke bawah disebabkan oleh adanya gaya magnet bumi.", options: ["Sesuai", "Tidak Sesuai"], answer: 1 },
+            { id: 40, type: "bool", text: "Tumbuhnya kumis dan dada menjadi lebih bidang adalah ciri perkembangan sekunder pada remaja laki-laki di masa pubertas.", options: ["Sesuai", "Tidak Sesuai"], answer: 0 },
+            { id: 41, type: "bool", text: "Dalam sebuah jaring-jaring makanan, jamur dan bakteri berperan sebagai produsen yang menghasilkan makanan sendiri.", options: ["Sesuai", "Tidak Sesuai"], answer: 1 },
+            { id: 42, type: "bool", text: "Bunyi dapat merambat di ruang hampa udara (vakum) seperti di luar angkasa dengan sangat cepat.", options: ["Sesuai", "Tidak Sesuai"], answer: 1 },
+            { id: 43, type: "bool", text: "Penyakit osteoporosis adalah kondisi di mana tulang menjadi rapuh karena kekurangan kalsium, yang dapat dicegah dengan mengonsumsi susu.", options: ["Sesuai", "Tidak Sesuai"], answer: 0 },
+            { id: 44, type: "bool", text: "Hujan asam adalah fenomena alam normal yang membantu menyuburkan tanah dan menjaga kebersihan air sungai.", options: ["Sesuai", "Tidak Sesuai"], answer: 1 },
+            { id: 45, type: "bool", text: "Pelestarian hewan langka yang dilakukan di habitat aslinya (seperti Taman Nasional Komodo) disebut pelestarian In-situ.", options: ["Sesuai", "Tidak Sesuai"], answer: 0 }
+        ];
+
+        function App() {
+            const [view, setView] = useState('start');
+            const [user, setUser] = useState({ nama: '', kelas: '' });
+            const [currentIndex, setCurrentIndex] = useState(0);
+            const [answers, setAnswers] = useState({});
+            const [ragu, setRagu] = useState({});
+            const [timeLeft, setTimeLeft] = useState(3600);
+            const [showAdmin, setShowAdmin] = useState(false);
+            const [showNav, setShowNav] = useState(false);
+
+            useEffect(() => {
+                if (view === 'quiz' && timeLeft > 0) {
+                    const timer = setInterval(() => setTimeLeft(prev => prev - 1), 1000);
+                    return () => clearInterval(timer);
+                }
+            }, [view, timeLeft]);
+
+            const handleSelect = (idx) => {
+                const q = questionBank[currentIndex];
+                if (q.type === 'pgk') {
+                    let current = answers[currentIndex] || [];
+                    if (current.includes(idx)) current = current.filter(i => i !== idx);
+                    else current = [...current, idx];
+                    setAnswers({...answers, [currentIndex]: current});
+                } else {
+                    setAnswers({...answers, [currentIndex]: idx});
+                }
+            };
+
+            const calculateSkor = () => {
+                let total = 0;
+                questionBank.forEach((q, i) => {
+                    const ans = answers[i];
+                    if (q.type === 'pgk' && Array.isArray(ans)) {
+                        let score = 0; 
+                        ans.forEach(a => q.answer.includes(a) ? score++ : score--);
+                        total += Math.max(0, score / q.answer.length);
+                    } else if (ans === q.answer) total += 1;
+                });
+                return Math.round((total / 45) * 100);
+            };
+
+            const finish = () => {
+                if (!confirm("Kirim jawaban sekarang?")) return;
+                const history = JSON.parse(localStorage.getItem('osn_db') || '[]');
+                localStorage.setItem('osn_db', JSON.stringify([...history, {...user, skor: calculateSkor(), date: new Date().toLocaleString()}]));
+                setView('result');
+            };
+
+            const getLabel = (index) => String.fromCharCode(65 + index);
+
+            if (view === 'start') return (
+                <div className="min-h-screen flex flex-col items-center justify-center p-4">
+                    <div className="kid-card p-8 w-full max-w-md shadow-2xl border-t-8 border-orange-400">
+                        <div className="text-center mb-6">
+                            <h1 className="text-2xl font-black text-teal-800 uppercase tracking-tight">OSN IPA TAHAP 2</h1>
+                            <p className="text-teal-600 font-bold">SDN 002 Sangatta Utara</p>
+                        </div>
+                        <input placeholder="Nama Lengkap" className="w-full p-4 mb-3 rounded-xl bg-gray-100 font-bold border-2 border-transparent focus:border-teal-500 outline-none" onChange={e => setUser({...user, nama: e.target.value})} />
+                        <input placeholder="Kelas" className="w-full p-4 mb-6 rounded-xl bg-gray-100 font-bold border-2 border-transparent focus:border-teal-500 outline-none" onChange={e => setUser({...user, kelas: e.target.value})} />
+                        <button onClick={() => user.nama && setView('quiz')} className="w-full bg-orange-500 text-white font-black py-4 rounded-xl shadow-[0_6px_0_#c2410c] hover:translate-y-1 hover:shadow-[0_2px_0_#c2410c] transition-all">MULAI UJIAN</button>
+                    </div>
+                    
+                    <div className="footer-combined">
+                        <div className="admin-link" onClick={() => prompt("Password Admin:") === '1995' && setShowAdmin(true)}>ADMIN</div>
+                        <span className="dev-text">dev: Hildegardis Septianita</span>
+                    </div>
+
+                    {showAdmin && (
+                        <div className="fixed inset-0 bg-white z-50 p-6 overflow-y-auto">
+                            <div className="flex justify-between items-center mb-6">
+                                <h2 className="text-xl font-black text-teal-800">REKAP NILAI SISWA</h2>
+                                <button onClick={()=>setShowAdmin(false)} className="bg-red-500 text-white px-4 py-2 rounded-lg font-bold">TUTUP</button>
+                            </div>
+                            <table className="w-full text-left text-sm border-collapse">
+                                <thead><tr className="border-b-2 bg-gray-100 text-teal-800"><th className="p-3">Nama</th><th className="p-3">Kelas</th><th className="p-3">Skor</th><th className="p-3">Waktu Selesai</th></tr></thead>
+                                <tbody>
+                                    {JSON.parse(localStorage.getItem('osn_db') || '[]').map((r, i) => (
+                                        <tr key={i} className="border-b hover:bg-gray-50"><td className="p-3 font-bold">{r.nama}</td><td className="p-3">{r.kelas}</td><td className="p-3 font-black text-orange-600">{r.skor}</td><td className="p-3 text-gray-500">{r.date}</td></tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    )}
+                </div>
+            );
+
+            if (view === 'quiz') return (
+                <div className="min-h-screen p-4 flex flex-col items-center">
+                    <div className="w-full max-w-2xl flex justify-between items-center mb-4">
+                        <button onClick={() => setShowNav(true)} className="bg-teal-900 text-white px-4 py-2 rounded-xl font-bold text-xs shadow-lg flex items-center gap-2">
+                           <span className="text-lg">📋</span> DAFTAR SOAL
+                        </button>
+                        <div className="bg-white text-teal-800 px-4 py-2 rounded-xl font-black shadow-lg flex items-center gap-2">
+                            <span className="text-lg">⏱️</span> {Math.floor(timeLeft/60)}:{String(timeLeft%60).padStart(2,'0')}
+                        </div>
+                    </div>
+
+                    <div className="kid-card p-6 w-full max-w-2xl shadow-xl min-h-[450px] mb-28 overflow-y-auto">
+                        <div className="flex items-center gap-2 mb-4">
+                           <span className="bg-teal-100 text-teal-800 px-3 py-1 rounded-full text-xs font-black">SOAL {currentIndex+1}</span>
+                           {questionBank[currentIndex].type === 'pgk' && <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-xs font-black">PILIH SEMUA YANG BENAR</span>}
+                        </div>
+                        <h2 className="text-lg font-bold text-gray-800 mb-6 leading-relaxed">{questionBank[currentIndex].text}</h2>
+                        <div className="grid gap-3">
+                            {questionBank[currentIndex].options.map((opt, i) => {
+                                const active = questionBank[currentIndex].type === 'pgk' ? (answers[currentIndex] || []).includes(i) : answers[currentIndex] === i;
+                                const isNormalPG = questionBank[currentIndex].type === 'pg';
+                                
+                                return (
+                                    <button key={i} onClick={() => handleSelect(i)} 
+                                        className={`p-4 rounded-xl border-2 text-left font-bold transition-all flex items-start gap-4 ${active ? (questionBank[currentIndex].type==='bool'?'bool-active':'option-active shadow-inner') : 'bg-gray-50 border-gray-200 hover:border-teal-300'}`}>
+                                        {isNormalPG && <span className="text-teal-600 opacity-60 font-black">{getLabel(i)}.</span>}
+                                        <span className="flex-1 leading-snug">{opt}</span>
+                                    </button>
+                                );
+                            })}
+                        </div>
+                    </div>
+
+                    <div className="fixed bottom-0 w-full max-w-2xl p-4 flex gap-2 bg-teal-800/90 backdrop-blur-md rounded-t-3xl border-t border-white/20 shadow-2xl">
+                        <button disabled={currentIndex===0} onClick={()=>setCurrentIndex(c=>c-1)} className="flex-1 bg-white/10 text-white py-4 rounded-xl font-black text-xs disabled:opacity-30">KEMBALI</button>
+                        <button onClick={()=>setRagu({...ragu, [currentIndex]: !ragu[currentIndex]})} className={`flex-1 py-4 rounded-xl font-black text-xs border-2 transition-colors ${ragu[currentIndex] ? 'ragu-active' : 'bg-yellow-400 text-yellow-900 border-yellow-500'}`}>RAGU-RAGU</button>
+                        {currentIndex === 44 ? 
+                        <button onClick={finish} className="flex-1 bg-red-500 text-white py-4 rounded-xl font-black text-xs shadow-[0_4px_0_#991b1b]">KIRIM</button> :
+                        <button onClick={()=>setCurrentIndex(c=>c+1)} className="flex-1 bg-white text-teal-800 py-4 rounded-xl font-black text-xs shadow-[0_4px_0_#cbd5e1]">BERIKUTNYA</button>}
+                    </div>
+
+                    {showNav && (
+                        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 p-6 flex items-center justify-center">
+                            <div className="bg-white p-6 rounded-3xl w-full max-w-sm max-h-[85vh] flex flex-col shadow-2xl">
+                                <h3 className="font-black text-center text-teal-800 mb-4 tracking-tighter">NAVIGASI SOAL</h3>
+                                <div className="grid-nav mb-6 overflow-y-auto p-2 pr-1">
+                                    {questionBank.map((_, i) => (
+                                        <button key={i} onClick={()=>{setCurrentIndex(i); setShowNav(false)}} 
+                                            className={`nav-btn border-2 transition-all ${currentIndex === i ? 'scale-110 border-orange-400' : 'border-transparent'} ${ragu[i] ? 'ragu-active' : (answers[i] !== undefined ? 'bg-teal-500 text-white' : 'bg-gray-100 text-gray-400')}`}>
+                                            {i+1}
+                                        </button>
+                                    ))}
+                                </div>
+                                <button onClick={()=>setShowNav(false)} className="w-full bg-teal-800 text-white py-4 rounded-xl font-black">KEMBALI KE SOAL</button>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            );
+
+            if (view === 'result') return (
+                <div className="min-h-screen flex flex-col items-center justify-center p-4 text-center">
+                    <div className="kid-card p-10 w-full max-w-md shadow-2xl relative overflow-hidden">
+                        <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-teal-400 via-yellow-400 to-orange-400"></div>
+                        <div className="text-6xl mb-4">🏆</div>
+                        <h1 className="text-2xl font-black text-teal-800 mb-2">Ujian Selesai!</h1>
+                        <p className="text-gray-500 font-bold mb-8">Kerja bagus, {user.nama}! Jawabanmu telah terkirim.</p>
+                        <div className="bg-orange-50 p-8 rounded-3xl mb-8 border-4 border-orange-100">
+                            <p className="text-xs font-black text-orange-400 uppercase tracking-[0.2em] mb-2">Nilai Kamu</p>
+                            <p className="text-7xl font-black text-teal-800">{calculateSkor()}</p>
+                        </div>
+                        <button onClick={()=>window.location.reload()} className="w-full bg-teal-600 text-white py-4 rounded-xl font-black shadow-[0_6px_0_#064e3b] hover:translate-y-1 transition-all">KELUAR</button>
+                    </div>
+                </div>
+            );
+        }
+
+        ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+    </script>
+</body>
+</html>
